@@ -34,7 +34,7 @@ object JwtUtility {
   // future specs for development
   def decodePayload(jwtToken: String): Option[String] =
     jwtToken match {
-      case JsonWebToken(header, claimsSet, signature) => Option(claimsSet.asJsonString)
+      case JsonWebToken(header, claimsSet, signature) => Some(claimsSet.asJsonString)
       case _                                          => None
     }
 }

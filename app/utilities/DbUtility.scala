@@ -35,7 +35,7 @@ class MovieTable(tag: Tag) extends Table[Movie](tag, "Movie") {
 class Booking_TransactionTable(tag: Tag) extends
   Table[Booking_Transaction](tag, "Booking_Transaction") {
 
-  def trans_id = column[Long]("trans_id", O.PrimaryKey, O.AutoInc)
+  def trans_id = column[Long]("trans_id", O.PrimaryKey)
   def movie_id = column[String]("movie_id")
   def email = column[String]("email")
   def name = column[String]("name")
@@ -92,7 +92,10 @@ object DbUtility {
 
       // if such a user (with given email id) exists
       case Some(User(mail, pwd)) => {
-        if(pwd == password) Some(JwtUtility.createToken(email + password))
+        if(pwd == password) Some(
+          JwtUtility.createToken(Json.obj("email" -> email,
+          "password" -> password).toString)
+        )
         else None
       }
 
@@ -102,15 +105,21 @@ object DbUtility {
 
   }
 
-  def addTransaction(trans_id: Long, movie_id: String,
+  def addTransaction(movie_id: String,
                      email: String, name: String,
                      cardno: String, cvv: Int,
                      month: String, year: String): Future[Option[String]] = {
 
+
     // we convert the month and year to a mysql date Datatype
-    db.run(booking_transactions += Booking_Transaction(
-      trans_id, movie_id, email, name, cardno, cvv, year + "-" + month + "-01"
-    )).map(_ => Some("Booking transaction successful"))
+    db.run(booking_transactions.length.result).flatMap {
+      x =>
+        db.run(booking_transactions +=
+          Booking_Transaction(x + 1, movie_id, email,
+            name, cardno, cvv, year + "-" + month + "-01")).map {
+          _ => Some("Transaction Successful")
+        }
+    }
   }
 
 

@@ -13,10 +13,13 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # route to register a user. The data is provided through the url form encoded manner
-POST    /api/register               controllers.HomeController.register
+PUT    /api/register               controllers.HomeController.register
 
 # route to list all the available movies in the database
 GET     /api/movies                 controllers.HomeController.getMovies
 
 # route to authenticate a user. The data is provided through the url form encoded manner
-POST    /api/login               controllers.HomeController.authenticate
+POST    /api/login                  controllers.HomeController.authenticate
+
+# route for the secured movie booking service
+PUT    /api/book                   controllers.HomeController.book
