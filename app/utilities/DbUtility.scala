@@ -11,10 +11,13 @@ import slick.lifted.Tag
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
-  * Created by botman on 15/7/17.
+/** ********************************************************************************
+  * Utility mechanism for providing the functionality of Database connectivity
+  * using the slick library.
+  * ********************************************************************************
   */
 
+// slick table mapping for the User table in the database
 class UserTable(tag: Tag) extends Table[User](tag, "User") {
 
   def email = column[String]("email", O.PrimaryKey)
@@ -23,6 +26,7 @@ class UserTable(tag: Tag) extends Table[User](tag, "User") {
   override def * = (email, password) <> (User.tupled, User.unapply)
 }
 
+// slick table mapping for the Movie table in the database
 class MovieTable(tag: Tag) extends Table[Movie](tag, "Movie") {
 
   def movie_id = column[Int]("movie_id", O.PrimaryKey)
@@ -32,6 +36,7 @@ class MovieTable(tag: Tag) extends Table[Movie](tag, "Movie") {
   override def * = (movie_id, title, description) <> (Movie.tupled, Movie.unapply)
 }
 
+// slick table mapping for the Booking_Transaction table in the database
 class Booking_TransactionTable(tag: Tag) extends
   Table[Booking_Transaction](tag, "Booking_Transaction") {
 
@@ -48,6 +53,7 @@ class Booking_TransactionTable(tag: Tag) extends
 
 }
 
+// The Database utility object. Uses slick object
 object DbUtility {
 
   // json writes format for object of type Seq[Movies]
@@ -67,12 +73,16 @@ object DbUtility {
     }
   }
 
+  // slick database object
   val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
 
+  // table references
   val users = TableQuery[UserTable]
   val movies = TableQuery[MovieTable]
   val booking_transactions = TableQuery[Booking_TransactionTable]
 
+  // method to register a new user in the database
+  // this method adds data to the User table
   def register(email: String, password: String): Future[Option[String]] = {
     // following returns a Future[Option[User]]
     db.run(users.filter(_.email === email).result.headOption).flatMap {
@@ -86,6 +96,7 @@ object DbUtility {
     }
   }
 
+  // method to check if the user is authentic
   def authenticate(email: String, password: String): Future[Option[String]] = {
     // check if the credentials are present in the database
     db.run(users.filter(_.email === email).result.headOption).map{
@@ -105,15 +116,16 @@ object DbUtility {
 
   }
 
+  // to book tickets basically
   def addTransaction(movie_id: String,
                      email: String, name: String,
                      cardno: String, cvv: Int,
                      month: String, year: String): Future[Option[String]] = {
 
-
-    // we convert the month and year to a mysql date Datatype
     db.run(booking_transactions.length.result).flatMap {
       x =>
+
+        // I convert the month and year to a mysql date Datatype
         db.run(booking_transactions +=
           Booking_Transaction(x + 1, movie_id, email,
             name, cardno, cvv, year + "-" + month + "-01")).map {
@@ -122,8 +134,7 @@ object DbUtility {
     }
   }
 
-
-
+  // method to return the movies List
   // simply return all the possible movies in the movies table
   def getAllMovies: Future[Seq[Movie]] = db.run(movies.result)
 }

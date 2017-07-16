@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject._
 
-import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
 import utilities.{DbUtility, JwtUtility}
@@ -11,21 +10,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
+  * This controller creates an `Action` to handle HTTP requests to the
+  * Our desired REST endSystem
  */
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
-  /**
-   * Create an Action to render an HTML page with a welcome message.
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
+
+  // Action not really required. But I left it here.
+  // This can be modified through the templates to display
+  // an explanation of the REST end system and how to use it.
+  // I usually do that. But Didn't here.
   def index = Action {
     Ok(views.html.index("The rest Endpoint System is Ready"))
   }
 
+  // Action for registering a user
   def register = Action.async(parse.formUrlEncoded) {
     request =>
       val email= request.body("email").head
@@ -40,6 +39,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
         }
   }
 
+  //Action for authenticating the user
   def authenticate = Action.async(parse.formUrlEncoded) {
     request =>
       val email= request.body("email").head
@@ -54,11 +54,14 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
         }
   }
 
+  // Action to acquire the list of movies
   def getMovies = Action.async {
     implicit val format = DbUtility.MovieSeqWrites
     DbUtility.getAllMovies.map(x => Ok(Json.toJson(x)))
   }
 
+  // Action to book the ticket for a particular movie
+  // checks the token before performing the transaction
   // secure action
   def book = Action.async(parse.formUrlEncoded) {
     request =>
@@ -84,7 +87,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
             val month = request.body("month").head
             val year = request.body("year").head
 
-            // perform the DBtransaction
+            // perform the database transaction
             DbUtility.addTransaction(
               movie_id, email,
               name, cardno,
