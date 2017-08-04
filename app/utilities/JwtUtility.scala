@@ -12,7 +12,7 @@ import play.Logger
 object JwtUtility {
 
   // secret Tokenisation mechanism
-  val JwtSecretKey = "I love Nikita Chinchwade" // I really love her ;)
+  val JwtSecretKey = "shadows conceal the light" // It should for some time. I hope so
   val JwtSecretAlgo = "HS256"
   // These two values are eventually used for the on the go authentication
 
