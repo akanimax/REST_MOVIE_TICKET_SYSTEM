@@ -105,7 +105,7 @@ object DbUtility {
       case Some(User(mail, pwd)) => {
         if(pwd == password) Some(
           JwtUtility.createToken(Json.obj("email" -> email,
-          "password" -> password).toString)
+          "password" -> password).toString) // every small step builds towards a greater success
         )
         else None
       }
