@@ -72,7 +72,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       // check if the token passes the validation test
       if(JwtUtility.isValidToken(token)) {
         // the token is valid. So perform the book action
-        val payload = JwtUtility.decodePayload(token)
+        val payload = JwtUtility.decodePayload(token) // decode the payload portion of the token
+        // to extract the important information.
 
         payload match {
           case Some(credentials) => {
